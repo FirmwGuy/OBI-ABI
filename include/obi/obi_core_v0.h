@@ -140,7 +140,10 @@ struct obi_provider_v0 {
 /* Factory symbol to be exported by dynamically loadable providers (if used). */
 #define OBI_PROVIDER_FACTORY_SYMBOL_V0 "obi_provider_factory_v0"
 
-typedef struct obi_provider_factory_v0 {
+/* Provider modules export a global named `obi_provider_factory_v0` of this shape. */
+typedef struct obi_provider_factory_v0 obi_provider_factory_desc_v0;
+
+struct obi_provider_factory_v0 {
     uint32_t abi_major;
     uint32_t abi_minor;
     uint32_t struct_size;
@@ -150,7 +153,7 @@ typedef struct obi_provider_factory_v0 {
     const char* provider_version;
 
     obi_status (*create)(const obi_host_v0* host, obi_provider_v0* out_provider);
-} obi_provider_factory_v0;
+};
 
 /* Minimal reader interface for streaming bytes across profile boundaries. */
 typedef struct obi_reader_v0 obi_reader_v0;

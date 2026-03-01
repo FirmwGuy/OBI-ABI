@@ -19,6 +19,14 @@ The prose specification lives in the `OBI` repository.
 
 ---
 
+## Related Repositories
+
+- `OBI`: normative/informative prose specification, profile catalog, and conformance guidance.
+- `libobi`: runtime/loader implementation that uses these headers and resolves provider selection
+  at runtime.
+
+---
+
 ## Build / Install
 
 This repo is headers-only and includes a minimal Meson build for installation.
@@ -27,4 +35,3 @@ This repo is headers-only and includes a minimal Meson build for installation.
 meson setup build
 meson install -C build
 ```
-
