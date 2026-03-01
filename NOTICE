@@ -1,0 +1,6 @@
+OBI-ABI headers are licensed under the Mozilla Public License 2.0 (MPL-2.0).
+Copyright (c) 2026–present Victor M. Barrientos
+
+This repository provides the canonical C ABI header set for the Omni Backstage Interface (OBI).
+The prose specification lives in the separate OBI repository and may be licensed differently.
+
