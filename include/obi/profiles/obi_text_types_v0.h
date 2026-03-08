@@ -10,6 +10,12 @@
 extern "C" {
 #endif
 
+/* Provider-local opaque face handle.
+ *
+ * A face ID is valid only with the provider instance that created it. Separate text providers that
+ * load the same font bytes create their own local face IDs; hosts MUST NOT exchange raw face IDs
+ * across providers unless a future profile revision explicitly defines such an interop contract.
+ */
 typedef uint64_t obi_text_face_id_v0;
 
 typedef enum obi_text_direction_v0 {
@@ -36,7 +42,7 @@ typedef struct obi_text_metrics_v0 {
 } obi_text_metrics_v0;
 
 typedef struct obi_text_glyph_v0 {
-    uint32_t glyph_index; /* provider font glyph index (0 means "missing") */
+    uint32_t glyph_index; /* glyph index from the loaded font face (0 means "missing"); providers MUST NOT renumber glyphs */
     uint32_t cluster;     /* byte offset into the input UTF-8 */
 
     /* Positioning in pixels. Advances move the pen; offsets shift the glyph relative to the pen. */
@@ -58,4 +64,3 @@ typedef struct obi_text_bidi_run_v0 {
 #endif
 
 #endif /* OBI_PROFILE_TEXT_TYPES_V0_H */
-

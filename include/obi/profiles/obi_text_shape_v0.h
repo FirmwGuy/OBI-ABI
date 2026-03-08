@@ -20,6 +20,10 @@ enum {
     OBI_TEXT_SHAPE_CAP_FEATURES       = 1ull << 1,
     /* Provider accepts language tags (BCP47) for shaping decisions. */
     OBI_TEXT_SHAPE_CAP_LANGUAGE       = 1ull << 2,
+    /* Provider supports face_create_from_bytes / face_destroy using the shared text face-loading
+     * contract.
+     */
+    OBI_TEXT_SHAPE_CAP_FACE_CREATE_BYTES = 1ull << 3,
 };
 
 typedef struct obi_text_shape_params_v0 {
@@ -47,6 +51,17 @@ typedef struct obi_text_shape_api_v0 {
     uint32_t reserved;
     uint64_t caps;
 
+    /* Optional: create/destroy a provider-local face from bytes using the same loading contract as
+     * text.raster_cache. This enables split shaping/rasterization providers to load equivalent
+     * faces from the same font source without exchanging raw face IDs across providers.
+     */
+    obi_status (*face_create_from_bytes)(void* ctx,
+                                         obi_bytes_view_v0 font_bytes,
+                                         uint32_t face_index,
+                                         obi_text_face_id_v0* out_face);
+
+    void (*face_destroy)(void* ctx, obi_text_face_id_v0 face);
+
     /* Shape a UTF-8 text buffer into a sequence of glyphs for a specific face and pixel size.
      *
      * Buffer sizing:
@@ -54,6 +69,9 @@ typedef struct obi_text_shape_api_v0 {
      * - If glyph_cap is too small, the provider MUST set out_glyph_count and return BUFFER_TOO_SMALL.
      *
      * The provider MUST NOT retain pointers to @text after returning.
+     *
+     * glyph_index values refer to the glyph numbering of the loaded font face itself; providers
+     * MUST NOT renumber glyphs into provider-private IDs.
      */
     obi_status (*shape_utf8)(void* ctx,
                              obi_text_face_id_v0 face,
@@ -85,4 +103,3 @@ struct obi_text_shape_v0 {
 #endif
 
 #endif /* OBI_PROFILE_TEXT_SHAPE_V0_H */
-

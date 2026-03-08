@@ -90,7 +90,10 @@ typedef struct obi_render3d_api_v0 {
     uint32_t reserved;
     uint64_t caps;
 
-    /* Frame boundaries and presentation. */
+    /* Frame boundaries and presentation.
+     * @window must refer to a window created by gfx.window_input from the same provider instance,
+     * unless the provider explicitly documents a supported cross-provider bridge.
+     */
     obi_status (*begin_frame)(void* ctx, obi_window_id_v0 window, const obi_gfx3d_frame_params_v0* params);
     obi_status (*end_frame)(void* ctx, obi_window_id_v0 window);
 
@@ -129,4 +132,3 @@ struct obi_render3d_v0 {
 #endif
 
 #endif /* OBI_PROFILE_GFX_RENDER3D_V0_H */
-

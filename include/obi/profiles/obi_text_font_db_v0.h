@@ -54,7 +54,12 @@ typedef struct obi_font_source_v0 {
     obi_font_source_kind_v0 kind;
     uint32_t face_index; /* TTC/OTC index when applicable; 0 otherwise. */
 
-    /* Provider-owned font source. Valid until release() is called. */
+    /* Provider-owned font source. Valid until release() is called.
+     *
+     * The portable interop contract for split text providers is (font bytes, face_index). If a
+     * provider returns FILE_PATH, the host may load the file contents and pass those bytes into
+     * face-loading APIs exposed by text.raster_cache / text.shape providers.
+     */
     union {
         obi_bytes_view_v0 bytes;
         obi_utf8_view_v0 file_path; /* UTF-8 path, size excludes any trailing NUL if present */
@@ -77,7 +82,9 @@ typedef struct obi_text_font_db_api_v0 {
     uint32_t reserved;
     uint64_t caps;
 
-    /* Match a font face and return a source suitable for loading in text.raster_cache. */
+    /* Match a font face and return a source suitable for loading in text.raster_cache and/or
+     * text.shape face-loading APIs.
+     */
     obi_status (*match_face)(void* ctx,
                              const obi_font_match_req_v0* req,
                              obi_font_source_v0* out_source);
@@ -93,4 +100,3 @@ struct obi_text_font_db_v0 {
 #endif
 
 #endif /* OBI_PROFILE_TEXT_FONT_DB_V0_H */
-

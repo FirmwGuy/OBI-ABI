@@ -70,7 +70,11 @@ typedef struct obi_text_raster_cache_api_v0 {
     uint32_t reserved;
     uint64_t caps;
 
-    /* Create a font face from bytes (TTF/OTF/TTC). face_index selects in collections. */
+    /* Create a font face from bytes (TTF/OTF/TTC). face_index selects in collections.
+     *
+     * This loading contract is intentionally shared with text.shape so hosts can load equivalent
+     * provider-local faces into separate shaping/rasterization providers from the same font source.
+     */
     obi_status (*face_create_from_bytes)(void* ctx,
                                          obi_bytes_view_v0 font_bytes,
                                          uint32_t face_index,
@@ -109,4 +113,3 @@ struct obi_text_raster_cache_v0 {
 #endif
 
 #endif /* OBI_PROFILE_TEXT_RASTER_CACHE_V0_H */
-
