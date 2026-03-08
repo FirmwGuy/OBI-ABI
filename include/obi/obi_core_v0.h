@@ -17,7 +17,7 @@ extern "C" {
 #endif
 
 #define OBI_CORE_ABI_MAJOR 0u
-#define OBI_CORE_ABI_MINOR 1u
+#define OBI_CORE_ABI_MINOR 2u
 
 typedef int32_t obi_status;
 
@@ -54,7 +54,15 @@ typedef enum obi_log_level {
     OBI_LOG_INFO  = 1,
     OBI_LOG_WARN  = 2,
     OBI_LOG_ERROR = 3,
+    OBI_LOG_FATAL = 4,
 } obi_log_level;
+
+typedef enum obi_diagnostic_scope_v0 {
+    OBI_DIAG_SCOPE_RUNTIME  = 0,
+    OBI_DIAG_SCOPE_PROVIDER = 1,
+    OBI_DIAG_SCOPE_PROFILE  = 2,
+    OBI_DIAG_SCOPE_CALL     = 3,
+} obi_diagnostic_scope_v0;
 
 typedef enum obi_time_clock {
     /* Monotonic, suitable for timeouts and durations. */
@@ -72,6 +80,24 @@ typedef struct obi_utf8_view_v0 {
     const char* data;
     size_t size;
 } obi_utf8_view_v0;
+
+/* Structured diagnostic payload delivered to the host.
+ *
+ * All string pointers are borrowed and remain valid only for the duration of the callback unless a
+ * specific profile states otherwise. `status` may be `OBI_STATUS_OK` for informational diagnostics.
+ */
+typedef struct obi_diagnostic_v0 {
+    uint32_t struct_size;
+    uint32_t reserved;
+    uint32_t level; /* obi_log_level */
+    uint32_t scope; /* obi_diagnostic_scope_v0 */
+    int32_t  status; /* obi_status */
+    uint32_t reserved2;
+    const char* code;         /* Optional stable ASCII code, e.g. "io.open_failed". */
+    const char* message_utf8; /* Optional UTF-8 human-readable text. */
+    const char* provider_id;  /* Optional provider ID for provider/profile/call-scoped diagnostics. */
+    const char* profile_id;   /* Optional profile ID for profile/call-scoped diagnostics. */
+} obi_diagnostic_v0;
 
 /* Common vtable header: used for ABI validation. */
 typedef struct obi_vtable_header_v0 {
@@ -97,6 +123,11 @@ typedef struct obi_host_v0 {
 
     void     (*log)(void* ctx, obi_log_level level, const char* msg);
     uint64_t (*now_ns)(void* ctx, obi_time_clock clock);
+
+    /* Optional structured diagnostics sink. Providers SHOULD prefer this over `log` when available
+     * (check `struct_size` before reading it on older hosts).
+     */
+    void (*emit_diagnostic)(void* ctx, const obi_diagnostic_v0* diag);
 } obi_host_v0;
 
 typedef struct obi_provider_v0 obi_provider_v0;
@@ -124,8 +155,8 @@ typedef struct obi_provider_api_v0 {
                               void* out_profile,
                               size_t out_profile_size);
 
-    /* Optional: return a JSON description for tooling. The pointer must remain valid until the
-     * next describe_json call or provider destruction.
+    /* Optional: return a JSON description for tooling and host policy. The pointer must remain
+     * valid until the next describe_json call or provider destruction.
      */
     const char* (*describe_json)(void* ctx);
 

@@ -1,7 +1,7 @@
 # OBI-ABI
 ## Canonical C ABI Headers for OBI
 
-**Last Updated:** 2026-03-01  
+**Last Updated:** 2026-03-06  
 **Status:** Draft  
 **Repository Role:** ABI headers (normative shapes)
 
@@ -16,6 +16,14 @@ These headers are intended to be the single source of truth that hosts and provi
 against.
 
 The prose specification lives in the `OBI` repository.
+
+Note on provider metadata:
+
+- Providers MAY implement `obi_provider_api_v0.describe_json` (declared in `obi_core_v0.h`) to
+  expose tool-friendly metadata (implemented profiles, dependency list, licensing info,
+  diagnostics/host-safety behavior, etc.).
+- The recommended JSON shape and licensing guidance live in the `OBI` repository
+  (`OBI_PROVIDER_GUIDE.md`).
 
 ---
 
