@@ -17,7 +17,7 @@ extern "C" {
 #endif
 
 #define OBI_CORE_ABI_MAJOR 0u
-#define OBI_CORE_ABI_MINOR 2u
+#define OBI_CORE_ABI_MINOR 3u
 
 typedef int32_t obi_status;
 
@@ -131,6 +131,7 @@ typedef struct obi_host_v0 {
 } obi_host_v0;
 
 typedef struct obi_provider_v0 obi_provider_v0;
+typedef struct obi_provider_legal_metadata_v0 obi_provider_legal_metadata_v0;
 
 typedef struct obi_provider_api_v0 {
     uint32_t abi_major;
@@ -159,6 +160,20 @@ typedef struct obi_provider_api_v0 {
      * valid until the next describe_json call or provider destruction.
      */
     const char* (*describe_json)(void* ctx);
+
+    /* Optional: return structured legal metadata for host/runtime policy engines.
+     *
+     * Rules:
+     * - Caller provides @out_meta storage and size.
+     * - Any strings, arrays, and nested views referenced by @out_meta are borrowed.
+     * - Borrowed metadata remains valid until the next describe_legal_metadata call on the same
+     *   provider instance or provider destruction, unless the provider documents a longer lifetime.
+     * - Older providers may omit this callback entirely; callers must gate access using
+     *   obi_provider_api_v0.struct_size.
+     */
+    obi_status (*describe_legal_metadata)(void* ctx,
+                                          obi_provider_legal_metadata_v0* out_meta,
+                                          size_t out_meta_size);
 
     void (*destroy)(void* ctx);
 } obi_provider_api_v0;

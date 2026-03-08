@@ -3,7 +3,7 @@
 
 **Document Type:** Changelog
 **Status:** Draft
-**Last Updated:** 2026-03-07
+**Last Updated:** 2026-03-08
 
 ---
 
@@ -15,6 +15,8 @@ The prose specification lives in the sibling `OBI` repository.
 
 ### Added
 
+- Added `include/obi/obi_legal_v0.h` with typed legal metadata, dependency closure, route metadata,
+  preset policy, and legal-plan result shapes for runtime selector implementations.
 - Added `OBI_TEXT_SHAPE_CAP_FACE_CREATE_BYTES` to advertise optional face loading in
   `obi.profile:text.shape-0`.
 - Added optional `face_create_from_bytes(...)` and `face_destroy(...)` entrypoints to
@@ -23,6 +25,9 @@ The prose specification lives in the sibling `OBI` repository.
 
 ### Changed
 
+- Extended `obi_provider_api_v0` with the optional `describe_legal_metadata(...)` callback and
+  bumped `OBI_CORE_ABI_MINOR` to `3` so hosts can query typed legal facts without relying only on
+  ad hoc JSON parsing.
 - Clarified in `obi_gfx_types_v0.h` that `obi_window_id_v0` is a provider-instance-local opaque
   handle by default.
 - Clarified in `obi_gfx_gpu_device_v0.h` and `obi_gfx_render3d_v0.h` that `begin_frame` /
